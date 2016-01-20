@@ -45,7 +45,7 @@ object Benchmark1 {
 
     Console.println(s"Total time elapsed 1: ${(stop-start)/1000} 2: ${(stop2-start2)/1000} seconds")
 
-    Console.println( s"End of task")
+    sc.stop()
 
   }
 

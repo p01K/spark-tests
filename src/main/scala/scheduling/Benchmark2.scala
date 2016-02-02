@@ -3,12 +3,12 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import scala.io.Source
 
-object Benchmark1 {
+object Benchmark2 {
 
   def main(args: Array[String]) {
-    val NRDDS = 100
-    val NELEMENTS = 100000
-    val NITERATIONS = 100
+    val NRDDS = 1000
+    val NELEMENTS = 10
+    val NITERATIONS = 10
 
     val conf = new SparkConf().setAppName("Benchmark1")
       .setMaster(args(0))

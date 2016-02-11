@@ -1,6 +1,6 @@
 #!/bin/bash
-MYHOST=`hostname`
-#MYHOST=`hostname -I | xargs`
+# MYHOST=`hostname`
+MYHOST=`hostname -I | xargs`
 SUBMIT="${SPARK_HOME}/bin/spark-submit"
 SMASTER="spark://${MYHOST}:7077"
 

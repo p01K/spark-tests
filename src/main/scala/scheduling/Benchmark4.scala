@@ -3,7 +3,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import scala.io.Source
 
-object Benchmark3 {
+object Benchmark4 {
 
   def main(args: Array[String]) {
     val NRDDS = 1
@@ -11,7 +11,7 @@ object Benchmark3 {
     val NITERATIONS = 1
 
     if(args.length < 3){
-      Console.println("Benchmark3 <master> <partitions> <distScheduling>")
+      Console.println("Benchmark4 <master> <partitions> <distScheduling>")
     }
 
     val distScheduling = args(2) match {
@@ -42,7 +42,7 @@ object Benchmark3 {
     val start2 = System.currentTimeMillis()
 
     for(i <- 0 until NITERATIONS){
-      val sum = arrayrddpar.map(rdd => rdd.reduce(_+_))
+      val sum = arrayrddpar.map(rdd => rdd.count())
       // val sum = arrayrdd.reduce(_+_)
       // totalsum = totalsum + sum
     }

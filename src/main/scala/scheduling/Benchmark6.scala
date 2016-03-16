@@ -39,7 +39,7 @@ object Benchmark6 {
 
     val rdd = sc.parallelize(Array.tabulate(NELEMENTS)(i=>1)).repartition(args(1).toInt).cache()
 
-    Console.println(s"Distributed scheduling enabled: $distScheduling")
+    // Console.println(s"Distributed scheduling enabled: $distScheduling")
 
     rdd.count()
 
@@ -51,7 +51,7 @@ object Benchmark6 {
     }
     val stop = System.currentTimeMillis()
 
-    Console.println(s"Total time elapsed : ${(stop-start)/5000d} \nseconds sum == ${sum/5}")
+    Console.println(s"Total time elapsed : ${(stop-start)/5000d} ")
 
     sc.stop()
 

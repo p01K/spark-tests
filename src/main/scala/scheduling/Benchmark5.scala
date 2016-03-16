@@ -2,16 +2,16 @@ import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import scala.io.Source
-
-object Benchmark4 {
+//same as benchmark3 but with cachine enabled
+object Benchmark5 {
 
   def main(args: Array[String]) {
     val NRDDS = 1
-    val NELEMENTS = 100000
+    val NELEMENTS = 500000
     val NITERATIONS = 1
 
     if(args.length < 3){
-      Console.println("Benchmark4 <master> <partitions> <distScheduling>")
+      Console.println("Benchmark3 <master> <partitions> <distScheduling>")
     }
 
     val distScheduling = args(2) match {
@@ -28,28 +28,21 @@ object Benchmark4 {
 
     val sc = new SparkContext(conf)
 
-    val arrayrdd = Array.tabulate(NRDDS)(
-      l => sc.parallelize(Array.tabulate(NELEMENTS)(i=>i)).repartition(args(1).toInt)
-    )
-
+    val rdd = sc.parallelize(Array.tabulate(NELEMENTS)(i=>1)).repartition(args(1).toInt).cache()
 
     Console.println(s"Distributed scheduling enabled: $distScheduling")
 
+    rdd.count()
+
     val start = System.currentTimeMillis()
 
-    val arrayrddpar = arrayrdd.par
-
-    val start2 = System.currentTimeMillis()
-
-    for(i <- 0 until NITERATIONS){
-      val sum = arrayrddpar.map(rdd => rdd.count())
-      // val sum = arrayrdd.reduce(_+_)
-      // totalsum = totalsum + sum
+    var sum = 0
+    for( i <- 0 until 5){
+      sum += rdd.reduce(_+_)
     }
-
     val stop = System.currentTimeMillis()
 
-    Console.println(s"Total time elapsed : ${(stop-start)/1000d}  seconds")
+    Console.println(s"Total time elapsed : ${(stop-start)/5000d} seconds\nSum == ${sum/5}")
 
     sc.stop()
 

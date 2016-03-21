@@ -37,7 +37,7 @@ object Benchmark5 {
     val start = System.currentTimeMillis()
 
     var sum = 0
-    for( i <- 0 until 5){
+    for( i <- 0 until 10){
       sum += rdd.reduce(_+_)
     }
     val stop = System.currentTimeMillis()

@@ -1,16 +1,30 @@
 #!/bin/bash
 
 # echo "Distributed scheduling false"
-# for partitions in 256 512 1024 2048 4096 8192
+# for partitions in 512 1024 2048 4096 8192 16384 32768
 # do
 #     ./submit.sh Benchmark5 "$partitions false"
 # done
 
 # echo "Distributed scheduling true"
-# for partitions in 256 512 1024 2048 4096 8192
+# for partitions in 512 1024 2048 4096 8192 16384 32768
 # do
-#     ./submit.sh Benchmark5 "$partitions true"
+#     ./submit.sh Benchmark5 "$partitions true 4"
 # done
+
+echo "Distributed scheduling false"
+for partitions in 512 1024 #2048 4096 8192 16384 32768
+do
+    ./submit.sh Filter "$partitions false"
+done
+
+echo "Distributed scheduling true"
+for partitions in 512 1024  #2048 4096 8192 16384 32768
+do
+    ./submit.sh Filter "$partitions true 4"
+done
+
+
 
 # echo "Distributed scheduling false"
 # for partitions in 256 512 1024 2048 4096 8192
@@ -24,10 +38,10 @@
 #     ./submit.sh Benchmark6 "$partitions true 0"
 # done
 
-for scheduler in 1 2 4 8 16 32
-do
-    ./submit.sh Benchmark5 "$partitions 8192 true $scheduler"
-done
+# for scheduler in 1 2 4 8 16 32
+# do
+#     ./submit.sh Benchmark5 "$partitions 8192 true $scheduler"
+# done
 
 
 

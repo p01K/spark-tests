@@ -70,6 +70,50 @@ object ReducePlus{
   }
 }
 
+object LongTail{
+
+  val r = new Random(1117)
+
+  def delay(nanos: Long):Unit = {
+    val starttime = System.nanoTime()
+    var elapsed   = 0L
+    do {
+      elapsed = System.nanoTime()-starttime
+    }while(elapsed<nanos)
+  }
+
+  def samplep(): Int = { //90% return 10 10% return 10000
+    val s = r.nextInt(100)
+    if( s>=90 )
+      50000000
+    else
+      100
+  }
+
+  def run(sc: SparkContext, npartitions: Int, runs: Int): Array[Double] = {
+
+    val rdd = sc.parallelize(Array.tabulate(npartitions)(i=>1))
+      .repartition(npartitions)
+      .cache()
+
+    rdd.count() //some warmup to enforce caching
+
+    val stats = Array.fill[Double](runs)(0d)
+
+    for( i <- 0 until runs){
+      val start  = System.currentTimeMillis()
+
+      val result = rdd.mapPartitions( p => {delay(samplep()); Array(1).toIterator}).collect()
+
+      stats(i)   = System.currentTimeMillis()-start
+    }
+
+    return stats
+  }
+
+
+}
+
 object Run{
   val NRDDS       = 1
   val NELEMENTS   = 500000
@@ -172,6 +216,8 @@ object Run{
         Filter33.run(sc,nelems,npart,runs)
       case "ReducePlus" =>
         ReducePlus.run(sc,nelems,npart,runs)
+      case "LongTail"   =>
+        LongTail.run(sc,npart,runs)
       case _            =>
         throw new Exception("Unknown algo")
     }

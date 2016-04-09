@@ -10,7 +10,8 @@ def submit_spark_job(classname,args):
     spark_home   = os.environ['SPARK_HOME']
     submit       = "{}/bin/spark-submit".format(spark_home)
     hostname     = socket.gethostname()
-    spark_master = "spark://{}:7077".format(hostname)
+    # spark_master = "spark://{}:7077".format(hostname)
+    spark_master = "spark://{}:7077".format('131.114.136.218')
     target       = 'target/scala-2.10/spark-tests_2.10-1.0.jar'
     props        = "{}/conf/spark-defaults.conf".format(spark_home)
     fargs        = "--master {} {}".format(spark_master,args)
@@ -58,7 +59,7 @@ def run_benchmark(algo,dsched,runs,partitions):
         args  ="--algo {} --dist-sched {} --nsched {} --partitions {} --runs {}".format(algo,dsched,nsched,p,runs)
         output=submit_spark_job('Run',args)
         timea = grep_output(output)
-        # print timea
+        print timea
         s=statistics(timea)
         print s
         result.append(s)
@@ -67,7 +68,7 @@ def run_benchmark(algo,dsched,runs,partitions):
 
 def whole_run(algo):
     print "with distributed scheduling"
-    partitions=[64,128,256,512,1024]
+    partitions=[32,64,128,256,512,1024,2048]
     results_true=run_benchmark(algo,'true',15,partitions)
 
     print "with default scheduling"
@@ -81,9 +82,9 @@ def whole_run(algo):
         print "{} & {:.2f} & {:.2f} & {:.2f} & {:.2f} &{:.2f} \\\\".format(e[0],e[1][0],e[1][1],e[2][0],e[2][1],e[3])
 
 
-# whole_run("Filter33")
-# whole_run("ReducePlus")
-# whole_run("Collect")
+whole_run("Filter33")
+whole_run("ReducePlus")
+whole_run("Collect")
 whole_run("LongTail")
 # algo   = "Filter33"
 # dsched = 'true'

@@ -57,15 +57,15 @@ object ReducePlus{
     rdd.count() //some warmup to enforce caching
 
     val stats = Array.fill[Double](runs)(0d)
-
+    var result = 0
     for( i <- 0 until runs){
       val start  = System.currentTimeMillis()
 
-      val result = rdd.reduce(_+_)
+      result    += rdd.reduce(_+_)
 
       stats(i)   = System.currentTimeMillis()-start
     }
-
+    Console.println(s"result == $result")
     return stats
   }
 }
@@ -111,8 +111,32 @@ object LongTail{
     return stats
   }
 
+}
+
+object WordCount {
+  val input = "data/wc/big.in"
+
+  def run(sc: SparkContext, npartitions: Int, runs: Int): Array[Double] = {
+
+    val data = sc.textFile(input).repartition(npartitions).cache()
+
+    val stats = Array.fill[Double](runs)(0d)
+
+    data.count()
+
+    for(i <- 0 until runs){
+      val start = System.currentTimeMillis()
+
+      val wc = data.flatMap(_.split(" ")).map( e => (e,1) ).reduceByKey(_+_).collect
+
+      stats(i)   = System.currentTimeMillis()-start
+    }
+    return stats
+
+  }
 
 }
+
 
 object Run{
   val NRDDS       = 1
@@ -218,6 +242,8 @@ object Run{
         ReducePlus.run(sc,nelems,npart,runs)
       case "LongTail"   =>
         LongTail.run(sc,npart,runs)
+      case "WordCount"  =>
+        WordCount.run(sc,npart,runs)
       case _            =>
         throw new Exception("Unknown algo")
     }

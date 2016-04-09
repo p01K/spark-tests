@@ -17,6 +17,7 @@ def submit_spark_job(classname,args):
     command      = "{} --class {} --properties-file {} {} {}".format(submit,classname,props,target,fargs)
 
     output = run_command(command)
+    # print output
     return output
 
 def run_command(command):
@@ -58,16 +59,31 @@ def run_benchmark(algo,dsched,runs,partitions):
         args  ="--algo {} --dist-sched {} --nsched {} --partitions {} --runs {}".format(algo,dsched,nsched,p,runs)
         output=submit_spark_job('Run',args)
         timea = grep_output(output)
+        print timea
+        s=statistics(timea)
+        # print s
+        result.append(s)
+    return result
+
+def run_benchmark_elems(algo,dsched,runs,partitions,elements):
+    nsched=4 #fixed for now
+    result=[]
+    p=partitions
+    for e in elements:
+        args  ="--algo {} --dist-sched {} --nsched {} "\
+               "--partitions {} --runs {} --nelems {} ".format(algo,dsched,nsched,p,runs,e)
+        output=submit_spark_job('Run',args)
+        timea = grep_output(output)
         # print timea
         s=statistics(timea)
-        print s
+        # print s
         result.append(s)
     return result
 
 
 def whole_run(algo):
     print "with distributed scheduling"
-    partitions=[64,128,256,512,1024]
+    partitions=[16,32,64,128,256,512]#,1024,2048,4096,8192]
     results_true=run_benchmark(algo,'true',15,partitions)
 
     print "with default scheduling"
@@ -80,11 +96,34 @@ def whole_run(algo):
     for e in array:
         print "{} & {:.2f} & {:.2f} & {:.2f} & {:.2f} &{:.2f} \\\\".format(e[0],e[1][0],e[1][1],e[2][0],e[2][1],e[3])
 
+def whole_run_elements(algo):
+    print "with distributed scheduling"
+    partitions=512
+    elements=[250000,1000000,4000000,16000000,64000000]
+    results_true=run_benchmark_elems(algo,'true',15,partitions,elements)
 
+    print "with default scheduling"
+    results_false=run_benchmark_elems(algo,'false',15,partitions,elements)
+
+    speedup = compute_speedup(results_true,results_false)
+
+    array = zip(elements,results_true,results_false,speedup)
+    
+    for e in array:
+        print "{} & {:.2f} & {:.2f} & {:.2f} & {:.2f} &{:.2f} \\\\".format(e[0],e[1][0],e[1][1],e[2][0],e[2][1],e[3])
+
+
+        
 # whole_run("Filter33")
 # whole_run("ReducePlus")
 # whole_run("Collect")
-whole_run("LongTail")
+# whole_run("LongTail")
+whole_run("WordCount")
+# whole_run_elements("Filter33")
+# whole_run_elements("ReducePlus")
+# whole_run_elements("Collect")
+# whole_run_elements("LongTail")
+
 # algo   = "Filter33"
 # dsched = 'true'
 # nsched = 4

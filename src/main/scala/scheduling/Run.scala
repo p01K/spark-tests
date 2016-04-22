@@ -140,7 +140,7 @@ object WordCount {
 
 object Run{
   val NRDDS       = 1
-  val NELEMENTS   = 500000
+  val NELEMENTS   = 5000000
   // val NITERATIONS = 1
   val RUNS        = 10
   val PARTITIONS  = 16

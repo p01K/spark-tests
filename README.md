@@ -1,8 +1,8 @@
 # spark-tests
 *p01K*
 
-Set of Apache Spark microbenchmarks(that hopefully strerr the Spark scheduler),
-to test an alternative scheduing mechanism.
+Set of Apache Spark microbenchmarks(that hopefully stress the Spark scheduler),
+to test an alternative scheduling mechanism.
 
 In order to build you have built the
 https://github.com/p01K/spark01 Spark mirror, (distScheduling branch)

@@ -1,3 +1,8 @@
+/*
+Set of microbenchmarks for Apache Spark
+@author katsogr
+ * */
+
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._

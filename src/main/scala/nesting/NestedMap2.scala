@@ -10,7 +10,7 @@ object NestedMap2 {
 
   def main(args: Array[String]) {
 
-    val conf = new SparkConf().setAppName("NestedRDD").setMaster(args(0))
+    val conf = new SparkConf().setAppName("NestedRDD").setMaster(args(0)).set("spark.executor.memory","8g")
 
     val sc = new SparkContext( new SparkConf() )
 

@@ -10,15 +10,18 @@ object NestedMap1 {
 
   def main(args: Array[String]) {
 
-    val conf = new SparkConf().setAppName("NestedRDD").setMaster(args(0))
+    val conf = new SparkConf()
+      .setAppName("NestedRDD")
+      .setMaster(args(0))
+      .set("spark.executor.memory","4g")
 
     val sc = new SparkContext(conf)
  
-    val textrdd = sc.textFile("/etc/passwd")
+    val textrdd = sc.textFile("nesting.dat")
 
     val maprdd = textrdd.map( word => textrdd.map(word2 =>  word+word2).collect() )
 
-    val collectmap = maprdd.first()
+    val collectmap = maprdd.collect()
 
     collectmap.foreach( Console.println(_) )
 

@@ -172,7 +172,7 @@ object Run{
   val PARTITIONS  = 16
   val NSCHED      = 4
 
-  def printUsageAndExit() = {
+  private def printUsageAndExit() = {
     // scalastyle:off println
     System.err.println(
             """

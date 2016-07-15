@@ -29,7 +29,7 @@ import scala.io.Source
 
 object NestedMap1 {
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]){
 
     val conf = new SparkConf()
       .setAppName("NestedRDD")
@@ -37,14 +37,14 @@ object NestedMap1 {
       .set("spark.executor.memory","4g")
 
     val sc = new SparkContext(conf)
- 
-    val textrdd = sc.textFile("nesting.dat")
+
+    val textrdd = sc.textFile("nesting.dat",1)
 
     val maprdd = textrdd.map( word => textrdd.map(word2 =>  word+word2).collect() )
 
     val collectmap = maprdd.collect()
 
-    collectmap.foreach( Console.println(_) )
+    collectmap.foreach( str => Console.println(s"${str.mkString(",")}") )
 
     Console.println( s"End of task")
 

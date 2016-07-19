@@ -90,10 +90,11 @@ object NestedCartesian{
         ).collect()
       )
       val collectmap = maprdd.collect()
-      collectmap.foreach( Console.println(_) )
+      assert(collectmap.size == nelems*nelems)
+      // collectmap.foreach( Console.println(_) )
       // collectmap.foreach( elem => elem.foreach( Console.println(_) ) )
 
-      stats(i)   = System.currentTimeMillis()-start
+      stats(i)   = (System.currentTimeMillis()-start)/1000d
     }
     return stats
   }

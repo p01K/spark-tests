@@ -96,6 +96,36 @@ object ReducePlus{
   }
 }
 
+object Cartesian{
+  def run(sc: SparkContext, nelems: Int, npartitions: Int, runs: Int): Array[Double] = {
+    val r = new Random(1117)
+
+    val rdd = sc.parallelize(Array.tabulate(nelems)(i=>r.nextInt(10000)),npartitions).cache()
+    val rdd2 = sc.parallelize(Array.tabulate(nelems)(i=>r.nextInt(10000)),npartitions).cache()
+
+    rdd.count() //some warmup to enforce data caching
+    rdd2.count()
+
+    val stats = Array.fill[Double](runs)(0d)
+
+    for( i <- 0 until runs){
+      val start  = System.currentTimeMillis()
+
+      val cart_rdd = rdd.cartesian(rdd2)
+
+      val collectmap = cart_rdd.collect()
+      assert(collectmap.size == nelems*nelems)
+
+      // collectmap.foreach( Console.println(_) )
+      // collectmap.foreach( elem => elem.foreach( Console.println(_) ) )
+
+      stats(i)   = (System.currentTimeMillis()-start)/1000d
+    }
+    return stats
+  }
+}
+
+
 object LongTail{
 
   val r = new Random(1117)
@@ -249,7 +279,9 @@ object Run{
     val conf = new SparkConf().setAppName("Benchmark").setMaster(master)
                               .set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
                               .set("spark.kryo.registrationRequired","false")
-                              .registerKryoClasses(Array(classOf[Array[Double]],classOf[Array[Int]]))
+      .registerKryoClasses(Array(classOf[Array[Double]],classOf[Array[Int]]))
+      .set("spark.executor.memory","4g")
+
 
     Console.println(s"conf: ${(algo,dsched,nsched,nelems,npart,runs,nrdds)}")
 
@@ -270,6 +302,8 @@ object Run{
         LongTail.run(sc,npart,runs)
       case "WordCount"  =>
         WordCount.run(sc,npart,runs)
+      case "Cartesian"  =>
+        Cartesian.run(sc,nelems,npart,runs)
       case _            =>
         throw new Exception("Unknown algo")
     }

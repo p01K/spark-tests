@@ -15,7 +15,8 @@ scalacOptions ++= Seq("-unchecked",
 libraryDependencies ++= Seq(
   "org.apache.spark" %% "spark-core"  % "1.6.0",
   "org.apache.spark" %% "spark-mllib" % "1.6.0",
-  "org.scalatest"    %% "scalatest"   % "2.2.4" % "test"
+  "org.scalatest"    %% "scalatest"   % "2.2.4" % "test",
+  "com.github.nscala-time" %% "nscala-time" % "2.16.0"
 )
 
 compileOrder := CompileOrder.JavaThenScala

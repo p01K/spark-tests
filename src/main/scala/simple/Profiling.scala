@@ -167,13 +167,13 @@ object UserProfiling {
 
     val sc = new SparkContext(conf)
 
-    val data = sc.textFile("/dataset_simulated//REPORT_ESTRAZ_TRAFF_COMUNE_ROMA_2016*.csv")
+    val data = sc.textFile("/dataset_simulated//REPORT_ESTRAZ_TRAFF_COMUNE_ROMA_201604*.csv")
       .map( line => CDR.from_string(line,field2col) )
       .filter( cdr => cdr.valid_region(cell2munic) ).cache()
 
     val count = data.count()
     println(s"Data count == $count")
-    val weeks = Array.tabulate(4)(i => i+4) // hardcoded for now
+    val weeks = Array.tabulate(4)(i => i+12) // hardcoded for now
 
     val wgroups = weeks.filter{ case w => w%4==0 }.zipWithIndex
 
@@ -182,14 +182,16 @@ object UserProfiling {
       val slice = weeks.slice(i,i+4)
       println(s"${slice.mkString(",")}")
       val profiles = data
-        .filter( cdr => slice.contains(cdr.week()) )
+        // .filter( cdr => slice.contains(cdr.week()) )
         .map( cdr =>
         ((cdr.user_id,cdr.region(cell2munic),slice.indexOf(cdr.week()),cdr.is_we(),cdr.day_time()),1)
-      ).collect()
-        // .reduceByKey{ case(v1,v2) => v1+v2 }.collect()
+      ).reduceByKey{ case(v1,v2) => v1+v2 }//.collect()
+
+      println(s"Count == ${profiles.count()}")
+
     //     // .map()
         // .reducrByKey{ case(v1,v2) => v1++v2} //concat
-      profiles.foreach( p => println(p) )
+      profiles.take(10).foreach( p => println(p) )
     }
     // val weeks = ....
     // group weeks

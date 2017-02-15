@@ -147,7 +147,7 @@ object BarnesHut{
       })
       val mass = particles.map( _.mass).reduce( _ + _ )
       val validNodes = children.filter( c => c != null )
-      validNodes.foreach( println( _ ) )
+      // validNodes.foreach( println( _ ) )
       QuadTree(mass,area.center() , 0 , sc.parallelize( validNodes)  )
     }
   }
@@ -157,8 +157,10 @@ object BarnesHut{
   //
   def main(args: Array[String]) {
 
-    val conf = new SparkConf().setAppName("BarnesHut").setMaster(args(0))
+    val conf = new SparkConf().setAppName("BarnesHut").setMaster(args(0)).set("spark.executor.memory","8g")
+
     val sc = new SparkContext(conf)
+
 
     val datafile = sc.textFile( args(1) )
     val particles = datafile.map( line => line.split(" ") match {
@@ -166,10 +168,17 @@ object BarnesHut{
         Particle(mass.toDouble , Location(locationX.toDouble,locationY.toDouble),0.0,id.toInt)
     })
     val realpart = particles.collect()
-    realpart.foreach( p => println( "Particle : " + p.toStr() ) )
-    val length = args(1).toInt
+    // realpart.foreach( p => println( "Particle : " + p.toStr() ) )
+    val length = args(2).toInt
+
+    val start  = System.currentTimeMillis()
+
     val tree = buildTree( sc , Area( Location(0,0) , Location( length,length )) ,realpart ).asInstanceOf[QuadTree]
     val forces = tree.calcForces( realpart.head )
-    forces.foreach( f => Console.println( f ) )
+
+    val time   = (System.currentTimeMillis()-start)/1000d
+
+    Console.println(s"Time: $time")
+    // forces.foreach( f => Console.println( f ) )
   }
 }

@@ -45,7 +45,7 @@ object Filter33{
     for( i <- 0 until runs){
       val start  = System.currentTimeMillis()
 
-      val result = rdd.filter( _%33 == 0).collect()
+      val result = rdd.filter( _%33 == 0).count()
 
       stats(i)   = System.currentTimeMillis()-start
     }
@@ -96,6 +96,34 @@ object ReducePlus{
   }
 }
 
+object MeasureRepartition{
+  def main(argv: Array[String]) = {
+    val conf = new SparkConf().setAppName("Benchmark").setMaster("spark://imr40:7077")
+                              .set("spark.serializer","org.apache.spark.serializer.KryoSerializer")
+                              .set("spark.kryo.registrationRequired","false")
+      .registerKryoClasses(Array(classOf[Array[Double]],classOf[Array[Int]]))
+      .set("spark.executor.memory","4g")
+
+    val sc = new SparkContext(conf)
+
+    val rdd = sc.parallelize(Array.tabulate(5000000)(i=>1)).repartition(8192).cache()
+
+    rdd.count() //some warmup to enforce caching
+
+    for( i <- 0 until 5){
+      val start  = System.currentTimeMillis()
+
+      val result = rdd.repartition(32).repartition(8192).count()
+
+      val time   = System.currentTimeMillis()-start
+      Console.println(s"time ==  ${time/1000}")
+    }
+    // Console.println(s" == $result")
+    // return stats
+  }
+}
+
+
 object Cartesian{
   def run(sc: SparkContext, nelems: Int, npartitions: Int, runs: Int): Array[Double] = {
     val r = new Random(1117)
@@ -113,8 +141,8 @@ object Cartesian{
 
       val cart_rdd = rdd.cartesian(rdd2)
 
-      val collectmap = cart_rdd.collect()
-      assert(collectmap.size == nelems*nelems)
+      val collectmap = cart_rdd.count()
+      // assert(collectmap.size == nelems*nelems)
 
       // collectmap.foreach( Console.println(_) )
       // collectmap.foreach( elem => elem.foreach( Console.println(_) ) )
@@ -170,7 +198,8 @@ object LongTail{
 }
 
 object WordCount {
-  val input = "data/wc/big.in"
+  //val input = "data/wc/wc.big"
+  val input = "data/wc/big2.in"
 
   def run(sc: SparkContext, npartitions: Int, runs: Int): Array[Double] = {
 

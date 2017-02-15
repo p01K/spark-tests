@@ -82,15 +82,15 @@ object NestedCartesian{
       val start  = System.currentTimeMillis()
 
       val maprdd = rdd.mapBlock( p1 =>
-        rdd.mapBlock( p2 =>
+        rdd2.mapBlock( p2 =>
           p1.map(e1 =>
             p2.map(e2 => (e1,e2)
             )
           ).flatten
         ).collect()
       )
-      val collectmap = maprdd.collect()
-      assert(collectmap.size == nelems*nelems)
+      val collectmap = maprdd.count()
+      // assert(collectmap.size == nelems*nelems)
       // collectmap.foreach( Console.println(_) )
       // collectmap.foreach( elem => elem.foreach( Console.println(_) ) )
 
@@ -106,7 +106,7 @@ object NestedCartesian{
     val conf = new SparkConf()
       .setAppName("NestedRDD")
       .setMaster(master)
-      .set("spark.executor.memory","4g")
+      .set("spark.executor.memory","8g")
 
       // .set("spark.executor.memory","4g")
 
